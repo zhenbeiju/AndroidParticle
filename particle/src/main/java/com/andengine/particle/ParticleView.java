@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.andengine.particle.modifier.AlphaParticleModifier;
+
 /**
  * 展示粒子效果
  * Created by zhanglin on 16-12-13.
@@ -16,7 +18,6 @@ public class ParticleView extends View {
     private long lastUpdateTime;
     private ParticleSystem particleSystem;
     private int animationTime;
-
 
     public ParticleView(Context context) {
         super(context);
@@ -42,10 +43,14 @@ public class ParticleView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawColor(0x00ffffff);
-        particleSystem.onManagedDraw(canvas);
+        if (isPlaying) {
+            particleSystem.onManagedDraw(canvas);
+        }
     }
 
+
     /**
+     *
      */
     public void startAnimation() {
         if (isPlaying) {
@@ -54,13 +59,12 @@ public class ParticleView extends View {
 
         isPlaying = true;
         startTime = System.currentTimeMillis();
+        lastUpdateTime = startTime;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 long current = System.currentTimeMillis();
-                lastUpdateTime = current;
                 while ((current - startTime) < animationTime) {
-
                     particleSystem.onManagedUpdate((current - lastUpdateTime) / 1000f);
                     lastUpdateTime = current;
                     postInvalidate();
@@ -74,6 +78,9 @@ public class ParticleView extends View {
                     }
                     current = System.currentTimeMillis();
                 }
+                isPlaying = false;
+                particleSystem.reset();
+                postInvalidate();
             }
         }).start();
     }
