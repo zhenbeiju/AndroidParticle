@@ -5,17 +5,16 @@ Android Particle System from AndEngine ,works in a normal view
 
 
 # Useage
- ## import
- ### gradle
+## import
+### gradle
     `compile 'com.zhenbeiju:particle:0.0.3'`
- ### maven
-   <dependency>
-      <groupId>com.zhenbeiju</groupId>
+### maven
+      `<groupId>com.zhenbeiju</groupId>
       <artifactId>particle</artifactId>
       <version>0.0.3</version>
-      <type>pom</type>
+      <type>pom</type>`
 
- ## use demo
+## use demo
     1. create EntityFactory with a bitmap
        EntityFactory entityFactory = new EntityFactory(bitmap);
     2. create EntityEmitter
@@ -27,5 +26,5 @@ Android Particle System from AndEngine ,works in a normal view
     5. start animation
        particleView.startAnimation();
 
-  ## bad things
+## bad things
     no double cache , probably draw slowly
