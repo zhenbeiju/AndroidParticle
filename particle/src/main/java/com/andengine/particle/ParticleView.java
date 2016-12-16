@@ -7,6 +7,9 @@ import android.view.View;
 
 import com.andengine.particle.modifier.AlphaParticleModifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 展示粒子效果
  * Created by zhanglin on 16-12-13.
@@ -16,8 +19,9 @@ public class ParticleView extends View {
     private boolean isPlaying;
     private long startTime;
     private long lastUpdateTime;
-    private ParticleSystem particleSystem;
     private int animationTime;
+    private List<ParticleSystem> particleSystems = new ArrayList<>();
+    private IAnimationListener animationListener;
 
     public ParticleView(Context context) {
         super(context);
@@ -31,8 +35,8 @@ public class ParticleView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setParticleSystem(ParticleSystem particleSystem) {
-        this.particleSystem = particleSystem;
+    public void addParticleSystem(ParticleSystem particleSystem) {
+        particleSystems.add(particleSystem);
     }
 
     public void setAnimationTime(int animationTime) {
@@ -44,7 +48,9 @@ public class ParticleView extends View {
         super.onDraw(canvas);
         canvas.drawColor(0x00ffffff);
         if (isPlaying) {
-            particleSystem.onManagedDraw(canvas);
+            for (ParticleSystem particleSystem : particleSystems) {
+                particleSystem.onManagedDraw(canvas);
+            }
         }
     }
 
@@ -64,8 +70,13 @@ public class ParticleView extends View {
             @Override
             public void run() {
                 long current = System.currentTimeMillis();
+                if(animationListener!=null){
+                    animationListener.onAnimationStart();
+                }
                 while ((current - startTime) < animationTime) {
-                    particleSystem.onManagedUpdate((current - lastUpdateTime) / 1000f);
+                    for (ParticleSystem particleSystem : particleSystems) {
+                        particleSystem.onManagedUpdate((current - lastUpdateTime) / 1000f);
+                    }
                     lastUpdateTime = current;
                     postInvalidate();
                     try {
@@ -79,9 +90,25 @@ public class ParticleView extends View {
                     current = System.currentTimeMillis();
                 }
                 isPlaying = false;
-                particleSystem.reset();
+                for (ParticleSystem particleSystem : particleSystems) {
+                    particleSystem.reset();
+                }
                 postInvalidate();
+                if(animationListener!=null){
+                    animationListener.onAnimationEnd();
+                }
             }
         }).start();
+    }
+
+    public void setAnimationListener(IAnimationListener listener) {
+        this.animationListener = listener;
+    }
+
+
+    public interface IAnimationListener {
+        void onAnimationStart();
+
+        void onAnimationEnd();
     }
 }
