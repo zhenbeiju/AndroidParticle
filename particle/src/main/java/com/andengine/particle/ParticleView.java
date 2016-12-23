@@ -20,6 +20,7 @@ public class ParticleView extends View {
     private long startTime;
     private long lastUpdateTime;
     private int animationTime;
+    private int backgroudColor = 0x00ffffff;
     private List<ParticleSystem> particleSystems = new ArrayList<>();
     private IAnimationListener animationListener;
 
@@ -35,29 +36,49 @@ public class ParticleView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    public void addParticleSystem(ParticleSystem particleSystem) {
-        particleSystems.add(particleSystem);
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawColor(backgroudColor);
+        if (isPlaying) {
+            synchronized (particleSystems) {
+                for (ParticleSystem particleSystem : particleSystems) {
+                    particleSystem.onManagedDraw(canvas);
+                }
+            }
+        }
+    }
+
+    public void setBackgroudColor(int backgroudColor) {
+        this.backgroudColor = backgroudColor;
     }
 
     public void setAnimationTime(int animationTime) {
         this.animationTime = animationTime;
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        canvas.drawColor(0x00ffffff);
-        if (isPlaying) {
-            for (ParticleSystem particleSystem : particleSystems) {
-                particleSystem.onManagedDraw(canvas);
+    public void addParticleSystem(ParticleSystem particleSystem) {
+        if (!particleSystems.contains(particleSystem)) {
+            synchronized (particleSystems) {
+                particleSystems.add(particleSystem);
             }
         }
     }
 
+    public void clearParticleSystem() {
+        synchronized (particleSystems) {
+            particleSystems.clear();
+        }
+    }
 
-    /**
-     *
-     */
+    public void removeParticleSystem(ParticleSystem particleSystem) {
+        synchronized (particleSystems) {
+            particleSystems.remove(particleSystem);
+        }
+    }
+
+
     public void startAnimation() {
         if (isPlaying) {
             return;
@@ -70,19 +91,21 @@ public class ParticleView extends View {
             @Override
             public void run() {
                 long current = System.currentTimeMillis();
-                if(animationListener!=null){
+                if (animationListener != null) {
                     animationListener.onAnimationStart();
                 }
                 while ((current - startTime) < animationTime) {
-                    for (ParticleSystem particleSystem : particleSystems) {
-                        particleSystem.onManagedUpdate((current - lastUpdateTime) / 1000f);
+                    synchronized (particleSystems) {
+                        for (ParticleSystem particleSystem : particleSystems) {
+                            particleSystem.onManagedUpdate((current - lastUpdateTime) / 1000f);
+                        }
                     }
                     lastUpdateTime = current;
                     postInvalidate();
                     try {
                         long useTime = System.currentTimeMillis() - current;
-                        if (useTime < 50) {
-                            Thread.sleep(50 - useTime);
+                        if (useTime < 40) {
+                            Thread.sleep(40 - useTime);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -94,7 +117,7 @@ public class ParticleView extends View {
                     particleSystem.reset();
                 }
                 postInvalidate();
-                if(animationListener!=null){
+                if (animationListener != null) {
                     animationListener.onAnimationEnd();
                 }
             }

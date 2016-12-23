@@ -80,6 +80,11 @@ public class ParticleSystem {
     public void reset() {
         this.mParticlesDueToSpawn = 0;
         this.mParticlesAlive = 0;
+        for (Particle particle : mParticles) {
+            if (particle != null) {
+                particle.reset();
+            }
+        }
     }
 
     protected void onManagedDraw(Canvas canvas) {

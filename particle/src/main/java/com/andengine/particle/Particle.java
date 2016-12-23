@@ -50,6 +50,7 @@ public class Particle {
         //TODO
         mLifeTime = 0;
         mExpired = false;
+        physicsHandler.reset();
     }
 
     public void onDraw(Canvas canvas) {

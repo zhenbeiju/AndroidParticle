@@ -99,8 +99,8 @@ public class PhysicsHandler  {
 	}
 
 	public void accelerate(final float pAccelerationX, final float pAccelerationY) {
-		this.mAccelerationX += pAccelerationX;
-		this.mAccelerationY += pAccelerationY;
+		this.mAccelerationX = pAccelerationX;
+		this.mAccelerationY = pAccelerationY;
 	}
 
 	public float getAngularVelocity() {
