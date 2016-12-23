@@ -7,7 +7,7 @@ Android Particle System from AndEngine ,works in a normal view
 # Useage
 ## import
 ### gradle
-    `compile 'com.zhenbeiju:particle:0.0.3'`
+    `compile 'com.zhenbeiju:particle:0.0.5'`
 ### maven
       `<groupId>com.zhenbeiju</groupId>
       <artifactId>particle</artifactId>
